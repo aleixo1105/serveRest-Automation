@@ -19,7 +19,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '14'  # A versão do Node.js que você vai usar
+        node-version: '16'  # A versão do Node.js que você vai usar
 
     - name: Install dependencies
       run: |
