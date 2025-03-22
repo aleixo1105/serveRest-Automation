@@ -1,0 +1,75 @@
+{
+	"id": "3ff54544-68a8-40ce-9730-5c080db80346",
+	"name": "Dev",
+	"values": [
+		{
+			"key": "url-base",
+			"value": "https://serverest.dev/",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "jwtToken",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "secretName",
+			"value": "fulano@qa.com",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "secretPassword",
+			"value": "teste",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "name",
+			"value": "Marcel Aleixo",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "email",
+			"value": "aleixo@gmail.com",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "password",
+			"value": "123456",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "id",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "newName",
+			"value": "Lecram Oxiela",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "newEmail",
+			"value": "oxiela@uol.com",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "newPassword",
+			"value": "654321",
+			"type": "default",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2025-03-22T00:16:39.786Z",
+	"_postman_exported_using": "Postman/11.37.4"
+}

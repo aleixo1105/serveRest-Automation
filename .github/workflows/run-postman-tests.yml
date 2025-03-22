@@ -1,0 +1,36 @@
+name: Run Postman Tests
+
+on:
+  push:
+    branches:
+      - main  # Ou a branch que você deseja monitorar
+  pull_request:
+    branches:
+      - main  # Ou a branch que você deseja monitorar
+
+jobs:
+  test:
+    runs-on: ubuntu-latest  # A máquina virtual que irá rodar o job
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2  # Faz o checkout do código no repositório
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'  # A versão do Node.js que você vai usar
+
+    - name: Install dependencies
+      run: |
+        npm install -g newman  # Instala o Newman globalmente
+
+    - name: Run Postman tests
+      run: |
+        newman run postman-collections/user-collection.json -e postman-environment/Dev-environment.json --reporters html,cli --reporter-html-export /report.html
+
+    - name: Upload test report
+      uses: actions/upload-artifact@v2
+      with:
+        name: postman-test-report
+        path: /path/to/report.html  # Caminho do relatório HTML gerado
