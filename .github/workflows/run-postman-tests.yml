@@ -30,7 +30,7 @@ jobs:
         newman run postman-collections/user-collection.json -e postman-environment/Dev-environment.json --reporters html,cli --reporter-html-export /report.html
 
     - name: Upload test report
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: postman-test-report
-        path: /path/to/report.html  # Caminho do relatório HTML gerado
+        path: report.html  # Caminho do relatório HTML gerado
