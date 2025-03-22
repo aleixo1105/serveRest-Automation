@@ -34,4 +34,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: postman-test-report
-        path: report.html  # Caminho do relatório HTML gerado
+        path: newman/report.html  # Caminho do relatório HTML gerado
