@@ -45,26 +45,31 @@ jobs:
     needs: postman-tests  # Garante que o job de carga só rode após os testes do Postman
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2  # Faz o checkout do código no repositório
+      - name: Checkout repository
+        uses: actions/checkout@v2  # Faz o checkout do código no repositório
 
-    - name: Install K6
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y software-properties-common
-        curl -s https://dl.k6.io/key.gpg | sudo apt-key add -
-        echo "deb https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
-        sudo apt-get update
-        sudo apt-get install k6 
-        
-    - name: Run K6 load test
-      run: k6 run loadTest.js --summary-export=result.json
+      - name: Install K6
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y software-properties-common
+          curl -s https://dl.k6.io/key.gpg | sudo apt-key add -
+          echo "deb https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6 
 
-    - name: Convert JSON to HTML
-      run: k6 run loadTest.js --summary-export=result.html
+      - name: Run K6 load test and generate JSON report
+        run: k6 run loadTest.js --out json=result.json
 
-    - name: Upload K6 HTML Report
-      uses: actions/upload-artifact@v4
-      with:
-        name: k6-test-report
-        path: result.html
+      - name: Convert JSON to HTML
+        run: |
+          echo "import { textSummary } from 'https://jslib.k6.io/k6-summary/0.0.1/index.js';
+          export function handleSummary(data) {
+              return { 'report.html': textSummary(data, { indent: ' ', enableColors: true }) };
+          }" > summary.js
+          k6 run loadTest.js --summary-export=report.html
+
+      - name: Upload K6 HTML Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-test-report
+          path: report.html
