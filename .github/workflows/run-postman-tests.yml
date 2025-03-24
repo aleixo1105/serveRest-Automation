@@ -56,10 +56,10 @@ jobs:
           ~/go/bin/xk6 build --with github.com/grafana/xk6-dashboard@latest
 
       - name: Run K6 load test and generate JSON report
-        run: ./k6 run loadTest.js --out json=result.json
+        run: k6 run loadTest.js --out json=result.json
 
       - name: Convert JSON to HTML
-        run: ./k6 run --out dashboard=result.json
+        run: k6 run --out dashboard=result.json
 
       - name: Upload K6 HTML Report
         uses: actions/upload-artifact@v4
