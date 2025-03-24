@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - master  # Ou a branch que você deseja monitorar
+      - qa
   pull_request:
     branches:
       - master  # Ou a branch que você deseja monitorar
+      - qa
 
 jobs:
   # Job para rodar os testes com o Newman
