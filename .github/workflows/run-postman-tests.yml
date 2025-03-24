@@ -64,4 +64,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: k6-test-results
-        path: result.json  # Caminho do arquivo de resultados do K6, caso queira salvar.
+        path: result.json  # Caminho do arquivo de resultados do K6, caso queira salvar
