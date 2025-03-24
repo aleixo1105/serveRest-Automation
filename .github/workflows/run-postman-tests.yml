@@ -61,7 +61,9 @@ jobs:
 
 
     - name: Run K6 load test
-      run: k6 run --out json=result.json loadTest.js | tail -f loadTest.js # Executa o teste de carga com o script loadTest.js
+      run: |
+        k6 run --out json=result.json loadTest.js 
+        tail -f loadTest.js # Executa o teste de carga com o script loadTest.js
 
     - name: Upload K6 test results
       uses: actions/upload-artifact@v4
