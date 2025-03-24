@@ -41,12 +41,12 @@ jobs:
 
   # Job para rodar os testes de carga com o K6
   load-test:
-    runs-on: ubuntu-latest  # A máquina virtual que irá rodar o job
-    needs: postman-tests  # Garante que o job de carga só rode após os testes do Postman
+    runs-on: ubuntu-latest
+    needs: postman-tests
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2  # Faz o checkout do código no repositório
+        uses: actions/checkout@v2
 
       - name: Install K6
         run: |
@@ -60,13 +60,12 @@ jobs:
       - name: Run K6 load test and generate JSON report
         run: k6 run loadTest.js --out json=result.json
 
-      - name: Convert JSON to HTML
+      - name: Install xk6-dashboard
         run: |
-          echo "import { textSummary } from 'https://jslib.k6.io/k6-summary/0.0.1/index.js';
-          export function handleSummary(data) {
-              return { 'report.html': textSummary(data, { indent: ' ', enableColors: true }) };
-          }" > summary.js
-          k6 run loadTest.js --summary-export=report.html
+          npm install -g xk6-dashboard
+
+      - name: Convert JSON to HTML
+        run: xk6-dashboard --input result.json --output report.html
 
       - name: Upload K6 HTML Report
         uses: actions/upload-artifact@v4
