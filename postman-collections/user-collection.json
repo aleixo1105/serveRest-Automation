@@ -7,583 +7,739 @@
 	},
 	"item": [
 		{
-			"name": "Login",
+			"name": "Regression",
 			"item": [
 				{
-					"name": "Get Token - JWT",
-					"event": [
+					"name": "Login",
+					"item": [
 						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.environment.set(\"jwtToken\", pm.response.json().authorization);\r",
-									""
+							"name": "Get Token - JWT",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.environment.set(\"jwtToken\", pm.response.json().authorization);\r",
+											"\r",
+											"let jsonData = pm.response.json();\r",
+											"\r",
+											"// Test to validate the success message\r",
+											"pm.test(\"The message is 'Login successful'\", function () {\r",
+											"    pm.expect(jsonData.message).to.eql(\"Login realizado com sucesso\");\r",
+											"});\r",
+											"\r",
+											"// Test to validate that the authorization starts with \"Bearer\" followed by a token\r",
+											"pm.test(\"Authorization starts with 'Bearer' followed by a token\", function () {\r",
+											"    pm.expect(jsonData.authorization).to.match(/^Bearer [A-Za-z0-9\\-_]+\\.[A-Za-z0-9\\-_]+\\.[A-Za-z0-9\\-_]+$/); // Matches the structure of a JWT token\r",
+											"});\r",
+											"\r",
+											"// Test to validate the response status\r",
+											"pm.test(\"Response status is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
 								],
-								"type": "text/javascript",
-								"packages": {}
-							}
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"email\": \"{{secretName}}\",\r\n  \"password\": \"{{secretPassword}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url-base}}login",
+									"host": [
+										"{{url-base}}login"
+									]
+								},
+								"description": "Generated from cURL: curl -X 'POST' \\\r\n  'https://serverest.dev/login' \\\r\n  -H 'accept: application/json' \\\r\n  -H 'Content-Type: application/json' \\\r\n  -d '{\r\n  \"email\": \"fulano@qa.com\",\r\n  \"password\": \"teste\"\r\n}'"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "User",
+					"item": [
+						{
+							"name": "Create User - New User",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"let gerarEmailAleatorio = eval(\"(\" + pm.globals.get(\"gerarEmailAleatorio\") + \")\");\r",
+											"let email = gerarEmailAleatorio();\r",
+											"console.log(\"Email gerado: \", email);\r",
+											"pm.environment.set(\"email\", email);\r",
+											"\r",
+											"\r",
+											"\r",
+											"let gerarNomeCompleto = eval(\"(\" + pm.globals.get(\"gerarNomeCompleto\") + \")\");\r",
+											"let name = gerarNomeCompleto();\r",
+											"console.log(\"Nome gerado: \", name);\r",
+											"pm.environment.set(\"name\", name);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 201){\r",
+											"    pm.environment.set(\"id\", pm.response.json()._id);\r",
+											"}\r",
+											"\r",
+											"pm.test(\"Status code is 201\", function () {\r",
+											"    pm.response.to.have.status(201);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response contains message\", function () {\r",
+											"    let jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData).to.have.property(\"message\", \"Cadastro realizado com sucesso\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response contains _id and it is a string\", function () {\r",
+											"    let jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData).to.have.property(\"_id\");\r",
+											"    pm.expect(jsonData._id).to.be.a(\"string\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"_id follows expected pattern\", function () {\r",
+											"    let jsonData = pm.response.json();\r",
+											"    let idPattern = /^[a-zA-Z0-9]{16}$/; // Regex to validate Alphanumeric\r",
+											"    pm.expect(jsonData._id).to.match(idPattern);\r",
+											"})\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"nome\": \"{{name}}\",\r\n  \"email\": \"{{email}}\",\r\n  \"password\": \"{{password}}\",\r\n  \"administrador\": \"true\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url-base}}usuarios",
+									"host": [
+										"{{url-base}}usuarios"
+									]
+								},
+								"description": "Generated from cURL: curl -X 'POST' \\\r\n  'https://serverest.dev/usuarios' \\\r\n  -H 'accept: application/json' \\\r\n  -H 'Content-Type: application/json' \\\r\n  -d '{\r\n  \"nome\": \"Marcel Aleixo\",\r\n  \"email\": \"marcelaleixo@qa.com.br\",\r\n  \"password\": \"teste\",\r\n  \"administrador\": \"true\"\r\n}'"
+							},
+							"response": []
 						},
 						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
+							"name": "Create User - Retry create same user",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response contains message\", function () {\r",
+											"    let jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData).to.have.property(\"message\", \"Este email já está sendo usado\");\r",
+											"});\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
 								],
-								"type": "text/javascript",
-								"packages": {}
-							}
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"nome\": \"{{name}}\",\r\n  \"email\": \"{{email}}\",\r\n  \"password\": \"{{password}}\",\r\n  \"administrador\": \"true\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url-base}}usuarios",
+									"host": [
+										"{{url-base}}usuarios"
+									]
+								},
+								"description": "Generated from cURL: curl -X 'POST' \\\r\n  'https://serverest.dev/usuarios' \\\r\n  -H 'accept: application/json' \\\r\n  -H 'Content-Type: application/json' \\\r\n  -d '{\r\n  \"nome\": \"Marcel Aleixo\",\r\n  \"email\": \"marcelaleixo@qa.com.br\",\r\n  \"password\": \"teste\",\r\n  \"administrador\": \"true\"\r\n}'"
+							},
+							"response": []
+						},
+						{
+							"name": "Get User - Filter all data",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let jsonData = pm.response.json();\r",
+											"\r",
+											"// 1. Validar que o status da resposta é 200\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"// 2. Validar que a resposta contém a propriedade \"quantidade\"\r",
+											"pm.test(\"Response contains 'quantidade'\", function () {\r",
+											"    pm.expect(jsonData).to.have.property(\"quantidade\");\r",
+											"    pm.expect(jsonData.quantidade).to.be.a(\"number\");\r",
+											"});\r",
+											"\r",
+											"// 3. Validar que a resposta contém a propriedade \"usuarios\" e que é um array\r",
+											"pm.test(\"Response contains 'usuarios' as an array\", function () {\r",
+											"    pm.expect(jsonData).to.have.property(\"usuarios\").that.is.an(\"array\");\r",
+											"});\r",
+											"\r",
+											"// 4. Validar que a quantidade de usuários na lista corresponde ao campo \"quantidade\"\r",
+											"pm.test(\"The number of users matches 'quantidade'\", function () {\r",
+											"    pm.expect(jsonData.usuarios.length).to.eql(jsonData.quantidade);\r",
+											"});\r",
+											"\r",
+											"// 5. Validar que cada usuário tem os campos esperados e que \"_id\" segue o padrão\r",
+											"pm.test(\"Each user has the expected properties, data and valid _id\", function () {\r",
+											"    let idPattern = /^[a-zA-Z0-9]{16}$/; // Regex para validar IDs com 16 caracteres alfanuméricos\r",
+											"\r",
+											"    jsonData.usuarios.forEach(user => {\r",
+											"        pm.expect(user).to.have.property(\"nome\").that.is.a(\"string\");\r",
+											"        pm.expect(user).to.have.property(\"email\").that.is.a(\"string\");\r",
+											"        pm.expect(user).to.have.property(\"password\").that.is.a(\"string\");\r",
+											"        pm.expect(user).to.have.property(\"administrador\").that.is.a(\"string\");\r",
+											"        pm.expect(user).to.have.property(\"_id\").that.is.a(\"string\");\r",
+											"        pm.expect(user._id).to.match(idPattern);\r",
+											"        pm.expect(user.nome).to.eql(pm.environment.get(\"name\"));\r",
+											"        pm.expect(user.email).to.eql(pm.environment.get(\"email\"));\r",
+											"        pm.expect(user.password).to.eql(pm.environment.get(\"password\"));\r",
+											"    });\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "https://serverest.dev/usuarios?_id={{id}}&nome={{name}}&email={{email}}&password={{password}}",
+									"protocol": "https",
+									"host": [
+										"serverest",
+										"dev"
+									],
+									"path": [
+										"usuarios"
+									],
+									"query": [
+										{
+											"key": "_id",
+											"value": "{{id}}"
+										},
+										{
+											"key": "nome",
+											"value": "{{name}}"
+										},
+										{
+											"key": "email",
+											"value": "{{email}}"
+										},
+										{
+											"key": "password",
+											"value": "{{password}}"
+										}
+									]
+								},
+								"description": "Generated from cURL: curl -X 'GET' \\\r\n  'https://serverest.dev/usuarios?_id=7PhGzNG6cVkVd88z&nome=nome&email=email&password=senha' \\\r\n  -H 'accept: application/json'"
+							},
+							"response": []
+						},
+						{
+							"name": "Get User - Filter by Id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let jsonData = pm.response.json();\r",
+											"\r",
+											"// 1. Validar que o status da resposta é 200\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"// 2. Validar que a resposta contém a propriedade \"quantidade\"\r",
+											"pm.test(\"Response contains 'quantidade'\", function () {\r",
+											"    pm.expect(jsonData).to.have.property(\"quantidade\");\r",
+											"    pm.expect(jsonData.quantidade).to.be.a(\"number\");\r",
+											"});\r",
+											"\r",
+											"// 3. Validar que a quantidade de usuários na lista seja 1, pois a pesquisa foi feita pelo ID\r",
+											"pm.test(\"Response contains only 1 user\", function () {\r",
+											"    pm.expect(jsonData.quantidade).to.eql(1);\r",
+											"    pm.expect(jsonData.usuarios.length).to.eql(1); // Garantir que a lista de usuários tem apenas 1 elemento\r",
+											"});\r",
+											"\r",
+											"// 4. Validar que a resposta contém a propriedade \"usuarios\" e que é um array\r",
+											"pm.test(\"Response contains 'usuarios' as an array\", function () {\r",
+											"    pm.expect(jsonData).to.have.property(\"usuarios\").that.is.an(\"array\");\r",
+											"});\r",
+											"\r",
+											"// 5. Validar que cada usuário tem os campos esperados e que \"_id\" segue o padrão\r",
+											"pm.test(\"Each user has the expected properties and valid _id\", function () {\r",
+											"    let idPattern = /^[a-zA-Z0-9]{16}$/; // Regex para validar IDs com 16 caracteres alfanuméricos\r",
+											"\r",
+											"    jsonData.usuarios.forEach(user => {\r",
+											"        pm.expect(user).to.have.property(\"nome\").that.is.a(\"string\");\r",
+											"        pm.expect(user).to.have.property(\"email\").that.is.a(\"string\");\r",
+											"        pm.expect(user).to.have.property(\"password\").that.is.a(\"string\");\r",
+											"        pm.expect(user).to.have.property(\"administrador\").that.is.a(\"string\");\r",
+											"        pm.expect(user).to.have.property(\"_id\").that.is.a(\"string\");\r",
+											"        pm.expect(user._id).to.eql(pm.environment.get(\"id\"));\r",
+											"        pm.expect(user._id).to.match(idPattern);\r",
+											"    });\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{url-base}}usuarios?_id={{id}}",
+									"host": [
+										"{{url-base}}usuarios"
+									],
+									"query": [
+										{
+											"key": "_id",
+											"value": "{{id}}"
+										}
+									]
+								},
+								"description": "Generated from cURL: curl -X 'GET' \\\r\n  'https://serverest.dev/usuarios?_id=7PhGzNG6cVkVd88z' \\\r\n  -H 'accept: application/json'"
+							},
+							"response": []
+						},
+						{
+							"name": "Update User - Modify all datas",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response body is correct\", function () {\r",
+											"    \r",
+											"    pm.expect(jsonData).to.have.property(\"message\", \"Registro alterado com sucesso\");\r",
+											"});\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"//Generate new Email\r",
+											"let gerarEmailAleatorio = eval(\"(\" + pm.globals.get(\"gerarEmailAleatorio\") + \")\");\r",
+											"let email = gerarEmailAleatorio();\r",
+											"console.log(\"Email gerado: \", email);\r",
+											"pm.environment.set(\"email\", email);\r",
+											"\r",
+											"\r",
+											"//Generate new Name\r",
+											"let gerarNomeCompleto = eval(\"(\" + pm.globals.get(\"gerarNomeCompleto\") + \")\");\r",
+											"let name = gerarNomeCompleto();\r",
+											"console.log(\"Nome gerado: \", name);\r",
+											"pm.environment.set(\"name\", name);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"nome\": \"{{name}}\",\r\n  \"email\": \"{{email}}\",\r\n  \"password\": \"{{password}}\",\r\n  \"administrador\": \"true\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url-base}}usuarios/{{id}}",
+									"host": [
+										"{{url-base}}usuarios"
+									],
+									"path": [
+										"{{id}}"
+									]
+								},
+								"description": "Generated from cURL: curl -X 'PUT' \\\r\n  'https://serverest.dev/usuarios/5IjJyxV1RWRpcJtO' \\\r\n  -H 'accept: application/json' \\\r\n  -H 'Content-Type: application/json' \\\r\n  -d '{\r\n  \"nome\": \"Fulakkuno\",\r\n  \"email\": \"beltranokuy11@qa.com.br\",\r\n  \"password\": \"tesuykte\",\r\n  \"administrador\": \"true\"\r\n}'"
+							},
+							"response": []
+						},
+						{
+							"name": "Get User - By Id - Validating data changes",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let jsonData = pm.response.json();\r",
+											"\r",
+											"// 1. Validar que o status da resposta é 200\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"// 2. Validar que a resposta contém as propriedades esperadas\r",
+											"pm.test(\"Response contains the expected properties\", function () {\r",
+											"    pm.expect(jsonData).to.have.property(\"nome\").that.is.a(\"string\");\r",
+											"    pm.expect(jsonData).to.have.property(\"email\").that.is.a(\"string\");\r",
+											"    pm.expect(jsonData).to.have.property(\"password\").that.is.a(\"string\");\r",
+											"    pm.expect(jsonData).to.have.property(\"administrador\").that.is.a(\"string\");\r",
+											"    pm.expect(jsonData).to.have.property(\"_id\").that.is.a(\"string\");\r",
+											"});\r",
+											"\r",
+											"// 3. Validar que a resposta contém as propriedades esperadas\r",
+											"pm.test(\"Response contains the expected data\", function () {\r",
+											"    pm.expect(jsonData.nome).to.eql(pm.environment.get(\"name\"));\r",
+											"    pm.expect(jsonData.email).to.eql(pm.environment.get(\"email\"));\r",
+											"    pm.expect(jsonData.password).to.eql(pm.environment.get(\"password\"));\r",
+											"\r",
+											"});\r",
+											"\r",
+											"// 4. Validar que o _id segue o padrão alfanumérico de 16 caracteres\r",
+											"pm.test(\"Valid _id format\", function () {\r",
+											"    let idPattern = /^[a-zA-Z0-9]{16}$/; // Regex para validar IDs com 16 caracteres alfanuméricos\r",
+											"    pm.expect(jsonData._id).to.match(idPattern);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{url-base}}usuarios/{{id}}",
+									"host": [
+										"{{url-base}}usuarios"
+									],
+									"path": [
+										"{{id}}"
+									]
+								},
+								"description": "Generated from cURL: curl -X 'GET' \\\r\n  'https://serverest.dev/usuarios/06ELvul2IkIPsNE9' \\\r\n  -H 'accept: application/json'"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete User",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response body is correct\", function () {\r",
+											"    let jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData).to.have.property(\"message\", \"Registro excluído com sucesso\");\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{url-base}}usuarios/{{id}}",
+									"host": [
+										"{{url-base}}usuarios"
+									],
+									"path": [
+										"{{id}}"
+									]
+								},
+								"description": "Generated from cURL: curl -X 'DELETE' \\\r\n  'https://serverest.dev/usuarios/PE0k2vmzwBZIJmCJ' \\\r\n  -H 'accept: application/json'"
+							},
+							"response": []
+						},
+						{
+							"name": "Get User - Finding user deleted",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response body is correct\", function () {\r",
+											"    let jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData).to.have.property(\"message\", \"Usuário não encontrado\");\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{url-base}}usuarios/{{id}}",
+									"host": [
+										"{{url-base}}usuarios"
+									],
+									"path": [
+										"{{id}}"
+									]
+								},
+								"description": "Generated from cURL: curl -X 'GET' \\\r\n  'https://serverest.dev/usuarios/06ELvul2IkIPsNE9' \\\r\n  -H 'accept: application/json'"
+							},
+							"response": []
 						}
 					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n  \"email\": \"{{secretName}}\",\r\n  \"password\": \"{{secretPassword}}\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{url-base}}login",
-							"host": [
-								"{{url-base}}login"
-							]
-						},
-						"description": "Generated from cURL: curl -X 'POST' \\\r\n  'https://serverest.dev/login' \\\r\n  -H 'accept: application/json' \\\r\n  -H 'Content-Type: application/json' \\\r\n  -d '{\r\n  \"email\": \"fulano@qa.com\",\r\n  \"password\": \"teste\"\r\n}'"
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "User",
-			"item": [
-				{
-					"name": "Create User",
 					"event": [
 						{
 							"listen": "prerequest",
 							"script": {
-								"exec": [
-									""
-								],
 								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
+								"packages": {},
 								"exec": [
-									"if (pm.response.code === 201){\r",
-									"    pm.environment.set(\"id\", pm.response.json()._id);\r",
+									"\r",
+									"function gerarEmailAleatorio() {\r",
+									"    const nomes = [\"ana\", \"carlos\", \"joao\", \"maria\", \"paulo\", \"fernanda\", \"lucas\", \"gabriela\"];\r",
+									"    const dominios = [\"gmail.com\", \"yahoo.com\", \"outlook.com\", \"hotmail.com\", \"aol.com\"];\r",
+									"    \r",
+									"    const nome = nomes[Math.floor(Math.random() * nomes.length)];\r",
+									"    const dominio = dominios[Math.floor(Math.random() * dominios.length)];\r",
+									"    \r",
+									"    return nome + Math.floor(Math.random() * 1000) + \"@\" + dominio;\r",
 									"}\r",
+									"pm.globals.set(\"gerarEmailAleatorio\", gerarEmailAleatorio.toString());\r",
 									"\r",
-									"pm.test(\"Status code is 201\", function () {\r",
-									"    pm.response.to.have.status(201);\r",
-									"});\r",
 									"\r",
-									"pm.test(\"Response contains message\", function () {\r",
-									"    let jsonData = pm.response.json();\r",
-									"    pm.expect(jsonData).to.have.property(\"message\", \"Cadastro realizado com sucesso\");\r",
-									"});\r",
 									"\r",
-									"pm.test(\"Response contains _id and it is a string\", function () {\r",
-									"    let jsonData = pm.response.json();\r",
-									"    pm.expect(jsonData).to.have.property(\"_id\");\r",
-									"    pm.expect(jsonData._id).to.be.a(\"string\");\r",
-									"});\r",
 									"\r",
-									"pm.test(\"_id follows expected pattern\", function () {\r",
-									"    let jsonData = pm.response.json();\r",
-									"    let idPattern = /^[a-zA-Z0-9]{16}$/; // Regex to validate Alphanumeric\r",
-									"    pm.expect(jsonData._id).to.match(idPattern);\r",
-									"})"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n  \"nome\": \"{{name}}\",\r\n  \"email\": \"{{email}}\",\r\n  \"password\": \"{{password}}\",\r\n  \"administrador\": \"true\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
+									"function gerarNomeCompleto() {\r",
+									"    const nomes = [\"Ana\", \"Carlos\", \"João\", \"Maria\", \"Paulo\", \"Fernanda\", \"Lucas\", \"Gabriela\"];\r",
+									"    const sobrenomes = [\"Silva\", \"Souza\", \"Oliveira\", \"Santos\", \"Lima\", \"Costa\", \"Pereira\", \"Rodrigues\"];\r",
+									"\r",
+									"    const nome = nomes[Math.floor(Math.random() * nomes.length)];\r",
+									"    const sobrenome = sobrenomes[Math.floor(Math.random() * sobrenomes.length)];\r",
+									"\r",
+									"    return `${nome} ${sobrenome}`;\r",
+									"}\r",
+									"pm.globals.set(\"gerarNomeCompleto\", gerarNomeCompleto.toString());\r",
+									"\r",
+									"\r",
+									""
+								]
 							}
 						},
-						"url": {
-							"raw": "{{url-base}}usuarios",
-							"host": [
-								"{{url-base}}usuarios"
-							]
-						},
-						"description": "Generated from cURL: curl -X 'POST' \\\r\n  'https://serverest.dev/usuarios' \\\r\n  -H 'accept: application/json' \\\r\n  -H 'Content-Type: application/json' \\\r\n  -d '{\r\n  \"nome\": \"Marcel Aleixo\",\r\n  \"email\": \"marcelaleixo@qa.com.br\",\r\n  \"password\": \"teste\",\r\n  \"administrador\": \"true\"\r\n}'"
-					},
-					"response": []
-				},
-				{
-					"name": "Get User - Filter Name",
-					"event": [
 						{
 							"listen": "test",
 							"script": {
-								"exec": [
-									"let jsonData = pm.response.json();\r",
-									"\r",
-									"// 1. Validar que o status da resposta é 200\r",
-									"pm.test(\"Status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
-									"});\r",
-									"\r",
-									"// 2. Validar que a resposta contém a propriedade \"quantidade\"\r",
-									"pm.test(\"Response contains 'quantidade'\", function () {\r",
-									"    pm.expect(jsonData).to.have.property(\"quantidade\");\r",
-									"    pm.expect(jsonData.quantidade).to.be.a(\"number\");\r",
-									"});\r",
-									"\r",
-									"// 3. Validar que a resposta contém a propriedade \"usuarios\" e que é um array\r",
-									"pm.test(\"Response contains 'usuarios' as an array\", function () {\r",
-									"    pm.expect(jsonData).to.have.property(\"usuarios\").that.is.an(\"array\");\r",
-									"});\r",
-									"\r",
-									"// 4. Validar que a quantidade de usuários na lista corresponde ao campo \"quantidade\"\r",
-									"pm.test(\"The number of users matches 'quantidade'\", function () {\r",
-									"    pm.expect(jsonData.usuarios.length).to.eql(jsonData.quantidade);\r",
-									"});\r",
-									"\r",
-									"// 5. Validar que cada usuário tem os campos esperados e que \"_id\" segue o padrão\r",
-									"pm.test(\"Each user has the expected properties and valid _id\", function () {\r",
-									"    let idPattern = /^[a-zA-Z0-9]{16}$/; // Regex para validar IDs com 16 caracteres alfanuméricos\r",
-									"\r",
-									"    jsonData.usuarios.forEach(user => {\r",
-									"        pm.expect(user).to.have.property(\"nome\").that.is.a(\"string\");\r",
-									"        pm.expect(user).to.have.property(\"email\").that.is.a(\"string\");\r",
-									"        pm.expect(user).to.have.property(\"password\").that.is.a(\"string\");\r",
-									"        pm.expect(user).to.have.property(\"administrador\").that.is.a(\"string\");\r",
-									"        pm.expect(user).to.have.property(\"_id\").that.is.a(\"string\");\r",
-									"        pm.expect(user._id).to.match(idPattern);\r",
-									"    });\r",
-									"});\r",
-									""
-								],
 								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [],
-								"type": "text/javascript"
+								"packages": {},
+								"exec": [
+									""
+								]
 							}
 						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "accept",
-								"value": "application/json"
-							}
-						],
-						"url": {
-							"raw": "{{url-base}}usuarios?nome={{name}}",
-							"host": [
-								"{{url-base}}usuarios"
-							],
-							"query": [
-								{
-									"key": "nome",
-									"value": "{{name}}"
-								}
-							]
-						},
-						"description": "Generated from cURL: curl -X 'GET' \\\r\n  'https://serverest.dev/usuarios?nome=marcel' \\\r\n  -H 'accept: application/json'"
-					},
-					"response": []
-				},
-				{
-					"name": "Get User - Filter all data",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"let jsonData = pm.response.json();\r",
-									"\r",
-									"// 1. Validar que o status da resposta é 200\r",
-									"pm.test(\"Status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
-									"});\r",
-									"\r",
-									"// 2. Validar que a resposta contém a propriedade \"quantidade\"\r",
-									"pm.test(\"Response contains 'quantidade'\", function () {\r",
-									"    pm.expect(jsonData).to.have.property(\"quantidade\");\r",
-									"    pm.expect(jsonData.quantidade).to.be.a(\"number\");\r",
-									"});\r",
-									"\r",
-									"// 3. Validar que a resposta contém a propriedade \"usuarios\" e que é um array\r",
-									"pm.test(\"Response contains 'usuarios' as an array\", function () {\r",
-									"    pm.expect(jsonData).to.have.property(\"usuarios\").that.is.an(\"array\");\r",
-									"});\r",
-									"\r",
-									"// 4. Validar que a quantidade de usuários na lista corresponde ao campo \"quantidade\"\r",
-									"pm.test(\"The number of users matches 'quantidade'\", function () {\r",
-									"    pm.expect(jsonData.usuarios.length).to.eql(jsonData.quantidade);\r",
-									"});\r",
-									"\r",
-									"// 5. Validar que cada usuário tem os campos esperados e que \"_id\" segue o padrão\r",
-									"pm.test(\"Each user has the expected properties and valid _id\", function () {\r",
-									"    let idPattern = /^[a-zA-Z0-9]{16}$/; // Regex para validar IDs com 16 caracteres alfanuméricos\r",
-									"\r",
-									"    jsonData.usuarios.forEach(user => {\r",
-									"        pm.expect(user).to.have.property(\"nome\").that.is.a(\"string\");\r",
-									"        pm.expect(user).to.have.property(\"email\").that.is.a(\"string\");\r",
-									"        pm.expect(user).to.have.property(\"password\").that.is.a(\"string\");\r",
-									"        pm.expect(user).to.have.property(\"administrador\").that.is.a(\"string\");\r",
-									"        pm.expect(user).to.have.property(\"_id\").that.is.a(\"string\");\r",
-									"        pm.expect(user._id).to.match(idPattern);\r",
-									"    });\r",
-									"});\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "accept",
-								"value": "application/json"
-							}
-						],
-						"url": {
-							"raw": "https://serverest.dev/usuarios?_id={{id}}&nome={{name}}&email={{email}}&password={{password}}",
-							"protocol": "https",
-							"host": [
-								"serverest",
-								"dev"
-							],
-							"path": [
-								"usuarios"
-							],
-							"query": [
-								{
-									"key": "_id",
-									"value": "{{id}}"
-								},
-								{
-									"key": "nome",
-									"value": "{{name}}"
-								},
-								{
-									"key": "email",
-									"value": "{{email}}"
-								},
-								{
-									"key": "password",
-									"value": "{{password}}"
-								}
-							]
-						},
-						"description": "Generated from cURL: curl -X 'GET' \\\r\n  'https://serverest.dev/usuarios?_id=7PhGzNG6cVkVd88z&nome=nome&email=email&password=senha' \\\r\n  -H 'accept: application/json'"
-					},
-					"response": []
-				},
-				{
-					"name": "Get User - Filter Id",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"let jsonData = pm.response.json();\r",
-									"\r",
-									"// 1. Validar que o status da resposta é 200\r",
-									"pm.test(\"Status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
-									"});\r",
-									"\r",
-									"// 2. Validar que a resposta contém a propriedade \"quantidade\"\r",
-									"pm.test(\"Response contains 'quantidade'\", function () {\r",
-									"    pm.expect(jsonData).to.have.property(\"quantidade\");\r",
-									"    pm.expect(jsonData.quantidade).to.be.a(\"number\");\r",
-									"});\r",
-									"\r",
-									"// 3. Validar que a quantidade de usuários na lista seja 1, pois a pesquisa foi feita pelo ID\r",
-									"pm.test(\"Response contains only 1 user\", function () {\r",
-									"    pm.expect(jsonData.quantidade).to.eql(1);\r",
-									"    pm.expect(jsonData.usuarios.length).to.eql(1); // Garantir que a lista de usuários tem apenas 1 elemento\r",
-									"});\r",
-									"\r",
-									"// 4. Validar que a resposta contém a propriedade \"usuarios\" e que é um array\r",
-									"pm.test(\"Response contains 'usuarios' as an array\", function () {\r",
-									"    pm.expect(jsonData).to.have.property(\"usuarios\").that.is.an(\"array\");\r",
-									"});\r",
-									"\r",
-									"// 5. Validar que cada usuário tem os campos esperados e que \"_id\" segue o padrão\r",
-									"pm.test(\"Each user has the expected properties and valid _id\", function () {\r",
-									"    let idPattern = /^[a-zA-Z0-9]{16}$/; // Regex para validar IDs com 16 caracteres alfanuméricos\r",
-									"\r",
-									"    jsonData.usuarios.forEach(user => {\r",
-									"        pm.expect(user).to.have.property(\"nome\").that.is.a(\"string\");\r",
-									"        pm.expect(user).to.have.property(\"email\").that.is.a(\"string\");\r",
-									"        pm.expect(user).to.have.property(\"password\").that.is.a(\"string\");\r",
-									"        pm.expect(user).to.have.property(\"administrador\").that.is.a(\"string\");\r",
-									"        pm.expect(user).to.have.property(\"_id\").that.is.a(\"string\");\r",
-									"        pm.expect(user._id).to.match(idPattern);\r",
-									"    });\r",
-									"});\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "accept",
-								"value": "application/json"
-							}
-						],
-						"url": {
-							"raw": "{{url-base}}usuarios?_id={{id}}",
-							"host": [
-								"{{url-base}}usuarios"
-							],
-							"query": [
-								{
-									"key": "_id",
-									"value": "{{id}}"
-								}
-							]
-						},
-						"description": "Generated from cURL: curl -X 'GET' \\\r\n  'https://serverest.dev/usuarios?_id=7PhGzNG6cVkVd88z' \\\r\n  -H 'accept: application/json'"
-					},
-					"response": []
-				},
-				{
-					"name": "Get User - By Id",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"let jsonData = pm.response.json();\r",
-									"\r",
-									"// 1. Validar que o status da resposta é 200\r",
-									"pm.test(\"Status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
-									"});\r",
-									"\r",
-									"// 2. Validar que a resposta contém as propriedades esperadas\r",
-									"pm.test(\"Response contains the expected properties\", function () {\r",
-									"    pm.expect(jsonData).to.have.property(\"nome\").that.is.a(\"string\");\r",
-									"    pm.expect(jsonData).to.have.property(\"email\").that.is.a(\"string\");\r",
-									"    pm.expect(jsonData).to.have.property(\"password\").that.is.a(\"string\");\r",
-									"    pm.expect(jsonData).to.have.property(\"administrador\").that.is.a(\"string\");\r",
-									"    pm.expect(jsonData).to.have.property(\"_id\").that.is.a(\"string\");\r",
-									"});\r",
-									"\r",
-									"// 3. Validar que o _id segue o padrão alfanumérico de 16 caracteres\r",
-									"pm.test(\"Valid _id format\", function () {\r",
-									"    let idPattern = /^[a-zA-Z0-9]{16}$/; // Regex para validar IDs com 16 caracteres alfanuméricos\r",
-									"    pm.expect(jsonData._id).to.match(idPattern);\r",
-									"});\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "accept",
-								"value": "application/json"
-							}
-						],
-						"url": {
-							"raw": "{{url-base}}usuarios/{{id}}",
-							"host": [
-								"{{url-base}}usuarios"
-							],
-							"path": [
-								"{{id}}"
-							]
-						},
-						"description": "Generated from cURL: curl -X 'GET' \\\r\n  'https://serverest.dev/usuarios/06ELvul2IkIPsNE9' \\\r\n  -H 'accept: application/json'"
-					},
-					"response": []
-				},
-				{
-					"name": "Edit User",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Response body is correct\", function () {\r",
-									"    let jsonData = pm.response.json();\r",
-									"    pm.expect(jsonData).to.have.property(\"message\", \"Registro alterado com sucesso\");\r",
-									"});\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n  \"nome\": \"{{newName}}\",\r\n  \"email\": \"{{email}}\",\r\n  \"password\": \"{{newPassword}}\",\r\n  \"administrador\": \"true\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{url-base}}usuarios/{{id}}",
-							"host": [
-								"{{url-base}}usuarios"
-							],
-							"path": [
-								"{{id}}"
-							]
-						},
-						"description": "Generated from cURL: curl -X 'PUT' \\\r\n  'https://serverest.dev/usuarios/5IjJyxV1RWRpcJtO' \\\r\n  -H 'accept: application/json' \\\r\n  -H 'Content-Type: application/json' \\\r\n  -d '{\r\n  \"nome\": \"Fulakkuno\",\r\n  \"email\": \"beltranokuy11@qa.com.br\",\r\n  \"password\": \"tesuykte\",\r\n  \"administrador\": \"true\"\r\n}'"
-					},
-					"response": []
-				},
-				{
-					"name": "Delete User",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Response body is correct\", function () {\r",
-									"    let jsonData = pm.response.json();\r",
-									"    pm.expect(jsonData).to.have.property(\"message\", \"Registro excluído com sucesso\");\r",
-									"});\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "accept",
-								"value": "application/json"
-							}
-						],
-						"url": {
-							"raw": "{{url-base}}usuarios/{{id}}",
-							"host": [
-								"{{url-base}}usuarios"
-							],
-							"path": [
-								"{{id}}"
-							]
-						},
-						"description": "Generated from cURL: curl -X 'DELETE' \\\r\n  'https://serverest.dev/usuarios/PE0k2vmzwBZIJmCJ' \\\r\n  -H 'accept: application/json'"
-					},
-					"response": []
+					]
 				}
 			],
 			"event": [
@@ -593,8 +749,6 @@
 						"type": "text/javascript",
 						"packages": {},
 						"exec": [
-							"//let randomName = `User${Math.floor(Math.random() * 10000)}`;\r",
-							"//pm.environment.set(\"randomUserName\", randomName);\r",
 							""
 						]
 					}
@@ -610,6 +764,28 @@
 					}
 				}
 			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
 		}
 	]
 }

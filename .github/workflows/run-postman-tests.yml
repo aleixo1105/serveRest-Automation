@@ -1,15 +1,18 @@
-name: Run Postman Tests
+name: Run Postman and Load Tests
 
 on:
   push:
     branches:
       - master  # Ou a branch que você deseja monitorar
+      - qa
   pull_request:
     branches:
       - master  # Ou a branch que você deseja monitorar
+      - qa
 
 jobs:
-  test:
+  # Job para rodar os testes com o Newman
+  postman-tests:
     runs-on: ubuntu-latest  # A máquina virtual que irá rodar o job
 
     steps:
@@ -22,16 +25,44 @@ jobs:
         node-version: '16'  # A versão do Node.js que você vai usar
 
     - name: Install dependencies
-      run:  npm install -g newman  # Instala o Newman globalmente
- 
+      run: npm install -g newman  # Instala o Newman globalmente
+
     - name: Install Newman and HTML Reporter
       run: npm install -g newman newman-reporter-htmlextra
 
     - name: Run Postman tests
-      run:  newman run postman-collections/user-collection.json -e postman-environments/Dev-environment.json -r htmlextra --reporter-htmlextra-export newman/report.html
+      run: newman run postman-collections/user-collection.json -e postman-environments/Dev-environment.json -r htmlextra --reporter-htmlextra-export newman/report.html
 
-    - name: Upload test report
+    - name: Upload Postman test report
       uses: actions/upload-artifact@v4
       with:
         name: postman-test-report
         path: newman/report.html  # Caminho do relatório HTML gerado
+
+  # Job para rodar os testes de carga com o K6
+  load-test:
+    runs-on: ubuntu-latest  # A máquina virtual que irá rodar o job
+    needs: postman-tests  # Garante que o job de carga só rode após os testes do Postman
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2  # Faz o checkout do código no repositório
+
+    - name: Install K6
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y software-properties-common
+        curl -s https://dl.k6.io/key.gpg | sudo apt-key add -
+        echo "deb https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+        sudo apt-get update
+        sudo apt-get install k6 
+
+
+    - name: Run K6 load test
+      run: k6 run loadTest.js  # Executa o teste de carga com o script loadTest.js
+
+    - name: Upload K6 test results
+      uses: actions/upload-artifact@v4
+      with:
+        name: k6-test-results
+        path: result.json  # Caminho do arquivo de resultados do K6, caso queira salvar.
