@@ -48,27 +48,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Install K6
+      - name: Install Go and xk6
         run: |
           sudo apt-get update
-          sudo apt-get install -y software-properties-common
-          curl -s https://dl.k6.io/key.gpg | sudo apt-key add -
-          echo "deb https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
-          sudo apt-get update
-          sudo apt-get install k6 
+          sudo apt-get install -y golang-go
+          go install go.k6.io/xk6/cmd/xk6@latest
+          ~/go/bin/xk6 build --with github.com/szkiba/xk6-dashboard@latest
 
       - name: Run K6 load test and generate JSON report
-        run: k6 run loadTest.js --out json=result.json
-
-      - name: Install xk6-dashboard
-        run: |
-          npm install -g xk6-dashboard
+        run: ./k6 run loadTest.js --out json=result.json
 
       - name: Convert JSON to HTML
-        run: xk6-dashboard --input result.json --output report.html
+        run: ./k6 run --out dashboard=result.json
 
       - name: Upload K6 HTML Report
         uses: actions/upload-artifact@v4
         with:
           name: k6-test-report
-          path: report.html
+          path: result.json
