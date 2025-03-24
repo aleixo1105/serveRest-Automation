@@ -57,16 +57,14 @@ jobs:
         sudo apt-get update
         sudo apt-get install k6 
         
-        
-
-
     - name: Run K6 load test
-      run: |
-        k6 run --out json=result.json loadTest.js 
-        tail -f loadTest.js # Executa o teste de carga com o script loadTest.js
+      run: k6 run loadTest.js --summary-export=result.json
 
-    - name: Upload K6 test results
+    - name: Convert JSON to HTML
+      run: k6 run loadTest.js --summary-export=result.html
+
+    - name: Upload K6 HTML Report
       uses: actions/upload-artifact@v4
       with:
-        name: k6-test-results
-        path: result.json  # Caminho do arquivo de resultados do K6, caso queira salvar.
+        name: k6-test-report
+        path: result.html
