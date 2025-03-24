@@ -50,12 +50,13 @@ jobs:
 
     - name: Install K6
       run: |
-      sudo apt-get update
-      sudo apt-get install -y software-properties-common
-      curl -s https://dl.k6.io/key.gpg | sudo apt-key add -
-      sudo echo "deb https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
-      sudo apt-get update
-      sudo apt-get install k6  # Instala o K6
+        sudo apt-get update
+        sudo apt-get install -y software-properties-common
+        curl -s https://dl.k6.io/key.gpg | sudo apt-key add -
+        echo "deb https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+        sudo apt-get update
+        sudo apt-get install k6 
+
 
     - name: Run K6 load test
       run: k6 run loadTest.js  # Executa o teste de carga com o script loadTest.js
@@ -64,4 +65,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: k6-test-results
-        path: result.json  # Caminho do arquivo de resultados do K6, caso queira salvar
+        path: result.json  # Caminho do arquivo de resultados do K6, caso queira salvar.
