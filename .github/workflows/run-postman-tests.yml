@@ -51,7 +51,10 @@ jobs:
     - name: Install K6
       run: |
         sudo apt-get update
-        sudo apt-get install -y k6  # Instala o K6
+        sudo apt-get install -y software-properties-common
+        sudo add-apt-repository ppa:k6io/k6
+        sudo apt-get update
+        sudo apt-get install k6  # Instala o K6
 
     - name: Run K6 load test
       run: k6 run loadTest.js  # Executa o teste de carga com o script loadTest.js
