@@ -64,3 +64,4 @@ jobs:
       with:
         name: k6-test-results
         path: result.json  # Caminho do arquivo de resultados do K6, caso queira salvar
+
