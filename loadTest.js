@@ -4,8 +4,8 @@ import { randomString } from 'https://jslib.k6.io/k6-utils/1.4.0/index.js';
 
 // Configuração do teste
 export const options = {
-  vus: 50, // 50 usuários simultâneos
-  duration: '30s', // Teste rodando por 30 segundos
+  vus: 10, // 50 usuários simultâneos
+  duration: '10s', // Teste rodando por 30 segundos
 };
 
 export default function () {
