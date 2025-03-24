@@ -54,6 +54,8 @@ jobs:
           sudo apt-get install -y golang-go
           go install go.k6.io/xk6/cmd/xk6@latest
           ~/go/bin/xk6 build --with github.com/grafana/xk6-dashboard@latest
+          sudo apt-get update
+          sudo apt-get install k6
 
       - name: Run K6 load test and generate JSON report
         run: k6 run loadTest.js --out json=result.json
