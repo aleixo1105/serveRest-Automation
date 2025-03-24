@@ -34,7 +34,7 @@
 		},
 		{
 			"key": "email",
-			"value": "aleixo@gmail.com",
+			"value": "",
 			"type": "default",
 			"enabled": true
 		},
@@ -49,27 +49,9 @@
 			"value": "",
 			"type": "default",
 			"enabled": true
-		},
-		{
-			"key": "newName",
-			"value": "Lecram Oxiela",
-			"type": "default",
-			"enabled": true
-		},
-		{
-			"key": "newEmail",
-			"value": "oxiela@uol.com",
-			"type": "default",
-			"enabled": true
-		},
-		{
-			"key": "newPassword",
-			"value": "654321",
-			"type": "default",
-			"enabled": true
 		}
 	],
 	"_postman_variable_scope": "environment",
-	"_postman_exported_at": "2025-03-22T00:16:39.786Z",
-	"_postman_exported_using": "Postman/11.37.4"
+	"_postman_exported_at": "2025-03-24T04:00:18.590Z",
+	"_postman_exported_using": "Postman/11.37.5"
 }
