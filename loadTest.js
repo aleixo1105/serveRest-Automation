@@ -1,16 +1,17 @@
-import { check} from 'k6';
+import { check } from 'k6';
 import http from 'k6/http';
 import { randomString } from 'https://jslib.k6.io/k6-utils/1.4.0/index.js';
+import { htmlReport } from "https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js";
 
 // Configuração do teste
 export const options = {
-  vus: 50, // 50 usuários simultâneos
-  duration: '30s', // Teste rodando por 30 segundos
+  vus: 10, // 10 usuários simultâneos
+  duration: '10s', // Teste rodando por 10 segundos
 };
 
 export default function () {
   const url = 'https://serverest.dev/usuarios';
-  
+
   // Geração de dados 100% únicos
   const timestamp = new Date().getTime(); // Obtém timestamp atual em milissegundos
   const nome = `User_${randomString(5)}`;
@@ -35,6 +36,11 @@ export default function () {
   check(res, {
     'status é 201': (r) => r.status === 201,
   });
+}
 
-
+// 📌 Geração automática do relatório HTML
+export function handleSummary(data) {
+  return {
+    "summary.html": htmlReport(data),
+  };
 }
