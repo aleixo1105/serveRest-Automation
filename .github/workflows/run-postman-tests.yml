@@ -5,10 +5,12 @@ on:
     branches:
       - master  # Ou a branch que você deseja monitorar
       - qa
+      - refactor/k6-project
   pull_request:
     branches:
       - master  # Ou a branch que você deseja monitorar
       - qa
+      - refactor/k6-project
 
 jobs:
   # Job para rodar os testes com o Newman
