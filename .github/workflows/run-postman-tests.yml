@@ -59,10 +59,10 @@ jobs:
 
 
     - name: Run K6 load test
-      run: k6 run --out json=result.json loadTest.js  # Executa o teste de carga com o script loadTest.js
+      run: ./k6 run loadTest.js
 
     - name: Upload K6 test results
       uses: actions/upload-artifact@v4
       with:
         name: k6-test-results
-        path: result.json  # Caminho do arquivo de resultados do K6, caso queira salvar.
+        path: summary.html
