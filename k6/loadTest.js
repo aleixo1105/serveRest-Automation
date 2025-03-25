@@ -14,7 +14,7 @@ export default function () {
 // 📌 Geração automática do relatório HTML
 export function handleSummary(data) {
   return {
-    "k6/reports/summary.html": htmlReport(data),
+    "k6/summary.html": htmlReport(data),
   };
 }
 
