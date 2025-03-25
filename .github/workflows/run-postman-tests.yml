@@ -41,37 +41,28 @@ jobs:
 
   # Job para rodar os testes de carga com o K6
   load-test:
-    runs-on: ubuntu-latest
-    needs: postman-tests
+    runs-on: ubuntu-latest  # A máquina virtual que irá rodar o job
+    needs: postman-tests  # Garante que o job de carga só rode após os testes do Postman
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v2  # Faz o checkout do código no repositório
 
     - name: Install K6
       run: |
-        sudo gpg -k
-        curl -fsSL https://dl.k6.io/key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/k6-archive-keyring.gpg
-        echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
-        sudo apt-get update && sudo apt-get install -y k6
+        sudo apt-get update
+        sudo apt-get install -y software-properties-common
+        curl -s https://dl.k6.io/key.gpg | sudo apt-key add -
+        echo "deb https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+        sudo apt-get update
+        sudo apt-get install k6 
 
-    - name: Run K6 load test and save summary
-      run: k6 run loadTest.js --summary-export=summary.json
 
-    - name: Install k6-summary-report
-      run: npm install -g k6-summary-report
+    - name: Run K6 load test
+      run: k6 run --out json=result.json loadTest.js  # Executa o teste de carga com o script loadTest.js
 
-    - name: Generate HTML Report
-      run: k6-summary-report -i summary.json -o report.html
-
-    - name: Upload K6 JSON results
+    - name: Upload K6 test results
       uses: actions/upload-artifact@v4
       with:
-        name: k6-json-results
-        path: summary.json
-
-    - name: Upload K6 HTML report
-      uses: actions/upload-artifact@v4
-      with:
-        name: k6-html-report
-        path: report.html
+        name: k6-test-results
+        path: result.json  # Caminho do arquivo de resultados do K6, caso queira salvar.
