@@ -58,11 +58,11 @@ jobs:
     - name: Run K6 load test and save JSON
       run: k6 run --out json=result.json loadTest.js
 
-    - name: Install xk6-dashboard
-      run: npm install -g xk6-dashboard
+    - name: Install k6-report
+      run: npm install -g k6-reporter
 
     - name: Generate HTML Report
-      run: xk6-dashboard --input result.json --output result.html
+      run: k6-reporter result.json result.html
 
     - name: Upload K6 JSON results
       uses: actions/upload-artifact@v4
