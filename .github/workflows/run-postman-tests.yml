@@ -55,23 +55,23 @@ jobs:
         echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
         sudo apt-get update && sudo apt-get install -y k6
 
-    - name: Run K6 load test and save JSON
-      run: k6 run --out json=result.json loadTest.js
+    - name: Run K6 load test and save summary
+      run: k6 run loadTest.js --summary-export=summary.json
 
-    - name: Install k6-report
-      run: npm install -g k6-reporter
+    - name: Install k6-summary-report
+      run: npm install -g k6-summary-report
 
     - name: Generate HTML Report
-      run: k6-reporter result.json result.html
+      run: k6-summary-report -i summary.json -o report.html
 
     - name: Upload K6 JSON results
       uses: actions/upload-artifact@v4
       with:
         name: k6-json-results
-        path: result.json
+        path: summary.json
 
     - name: Upload K6 HTML report
       uses: actions/upload-artifact@v4
       with:
         name: k6-html-report
-        path: result.html
+        path: report.html
