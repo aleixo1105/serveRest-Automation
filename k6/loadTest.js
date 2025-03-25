@@ -17,3 +17,5 @@ export function handleSummary(data) {
     "k6/reports/summary.html": htmlReport(data),
   };
 }
+
+
